@@ -1,0 +1,200 @@
+{
+  "_description": "Esquema de datos para GitHub Miner - Relaciones completas con información de contacto",
+  
+  "metadata": {
+    "query": "string - Query original usada",
+    "query_name": "string - Nombre de la query",
+    "fetched_at": "ISO datetime",
+    "total_repos_fetched": "number",
+    "total_users_found": "number"
+  },
+
+  "repositories": {
+    "_description": "Repositorios únicos indexados por github_id",
+    "<repo_github_id>": {
+      "github_id": "number",
+      "name": "string",
+      "full_name": "string",
+      "owner_login": "string",
+      "description": "string|null",
+      "stars": "number",
+      "forks": "number",
+      "language": "string|null",
+      "url": "string",
+      "created_at": "ISO datetime",
+      "updated_at": "ISO datetime",
+      "pushed_at": "ISO datetime",
+      "open_issues": "number",
+      "watchers": "number",
+      "topics": ["string"],
+      "license": "string|null",
+      "homepage": "string|null"
+    }
+  },
+
+  "users": {
+    "_description": "Usuarios únicos indexados por github_id con información de contacto",
+    "<user_github_id>": {
+      "github_id": "number",
+      "login": "string (unique username)",
+      "name": "string|null",
+      "avatar_url": "string",
+      "html_url": "string",
+      "bio": "string|null",
+      "company": "string|null",
+      "blog": "string|null",
+      "type": "User|Organization",
+      "created_at": "ISO datetime",
+      "updated_at": "ISO datetime",
+
+      "contact_info": {
+        "_description": "Información de contacto del usuario",
+        "email": "string|null (público en GitHub)",
+        "phone": "string|null (no disponible vía API)",
+        "linkedin": "string|null (extraído del blog o perfil)",
+        "twitter": "string|null",
+        "website": "string|null (blog del usuario)",
+        "location": "string|null (ubicación completa)",
+        "country": "string|null (extraído de location)",
+        "city": "string|null (extraído de location)",
+        "timezone": "string|null",
+        "hireable": "boolean",
+        "available_for_hire": "boolean (derivado de hireable)"
+      },
+
+      "social_stats": {
+        "_description": "Estadísticas de redes y actividad",
+        "followers": "number",
+        "following": "number",
+        "public_repos": "number",
+        "public_gists": "number"
+      }
+    }
+  },
+
+  "technologies": {
+    "_description": "Tecnologías/lenguajes detectados",
+    "<language_name>": {
+      "name": "string",
+      "repositories_count": "number",
+      "users_count": "number (unique users using this language)"
+    }
+  },
+
+  "user_repositories": {
+    "_description": "Repositorios públicos de cada usuario, indexados por user_id",
+    "<user_github_id>": {
+      "repos": ["<repo_github_id>"],
+      "repo_details": {
+        "<repo_github_id>": {
+          "github_id": "number",
+          "name": "string",
+          "full_name": "string",
+          "language": "string|null",
+          "stars": "number",
+          "forks": "number",
+          "description": "string|null",
+          "url": "string"
+        }
+      }
+    }
+  },
+
+  "relationships": {
+    "repo_to_contributors": {
+      "_description": "Repositorio -> Lista de contribuidores con número de contribuciones",
+      "<repo_github_id>": {
+        "contributors": [
+          {
+            "user_github_id": "number",
+            "contributions": "number",
+            "user_login": "string"
+          }
+        ]
+      }
+    },
+
+    "user_to_owned_repos": {
+      "_description": "Usuario -> Repositorios que ha creado",
+      "<user_github_id>": {
+        "owned_repos": ["<repo_github_id>"]
+      }
+    },
+
+    "user_to_contributed_repos": {
+      "_description": "Usuario -> Repositorios a los que ha contribuido",
+      "<user_github_id>": {
+        "contributed_repos": ["<repo_github_id>"],
+        "contribution_counts": {
+          "<repo_github_id>": "number"
+        }
+      }
+    },
+
+    "user_to_technologies": {
+      "_description": "Usuario -> Lenguajes/tecnologías que usa (basado en sus repos)",
+      "<user_github_id>": {
+        "languages": {
+          "<language_name>": {
+            "count": "number (repos using this language)",
+            "total_stars": "number",
+            "total_forks": "number"
+          }
+        }
+      }
+    },
+
+    "tech_to_users": {
+      "_description": "Lenguaje -> Usuarios que lo usan",
+      "<language_name>": {
+        "user_ids": ["<user_github_id>"]
+      }
+    },
+
+    "tech_to_repos": {
+      "_description": "Lenguaje -> Repositorios que lo usan",
+      "<language_name>": {
+        "repo_ids": ["<repo_github_id>"]
+      }
+    },
+
+    "country_to_users": {
+      "_description": "País -> Usuarios",
+      "<country_name>": {
+        "user_ids": ["<user_github_id>"],
+        "count": "number"
+      }
+    }
+  },
+
+  "scores": {
+    "_description": "Puntuaciones y rankings calculados",
+    "users": {
+      "_description": "Puntuación de usuarios basada en múltiples factores",
+      "<user_github_id>": {
+        "influence_score": "number (followers + sum of repo stars)",
+        "activity_score": "number (repos + contributions)",
+        "tech_diversity": "number (unique languages)",
+        "community_score": "number (contributions to other repos)",
+        "contact_completeness": "number (0-3 based on email/linkedin/location)"
+      }
+    },
+    "repositories": {
+      "_description": "Puntuación de repositorios",
+      "<repo_github_id>": {
+        "popularity_score": "number (stars * 2 + forks)",
+        "engagement_score": "number (open_issues + watchers)",
+        "quality_score": "number (derived from ratios)"
+      }
+    },
+    "technologies": {
+      "_description": "Ranking de tecnologías",
+      "<language_name>": {
+        "popularity_score": "number",
+        "total_stars": "number",
+        "total_repos": "number",
+        "total_users": "number"
+      }
+    }
+  }
+}

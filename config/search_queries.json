@@ -1,0 +1,12 @@
+{
+  "queries": [
+    {
+      "name": "Python repos with >20 stars",
+      "query": "language:python stars:>20",
+      "limit": 1,
+      "fetch_contributors": true,
+      "contributors_limit": 100,
+      "fetch_user_repos": true
+    }
+  ]
+}

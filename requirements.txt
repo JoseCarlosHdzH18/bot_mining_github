@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+requests
+redis
+psycopg2-binary
+sqlalchemy
+prometheus-client
+apscheduler
+python-dotenv
+rq
